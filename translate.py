@@ -18,7 +18,6 @@ def main(text):
     translateYandex(lang, text)
 
     textForBing = text.split()
-    print textForBing, len(textForBing)
     if (len(textForBing) == 1):
         translateBing(lang, text)
     else:
@@ -57,13 +56,16 @@ def translateBing(lang, text):
     request = urllib2.Request(link, headers=headers)
     response = urllib2.urlopen(request).read()
     results = json.loads(response)
-    translates = results['items'][0]
+    if len(results['items']) > 0:
+        translates = results['items'][0]
 
-    print '[Bing]'
-    for translate in translates:
-        noun = round((translate['confidence'] * 100), 0)
-        text = translate['normalizedTarget'].encode('utf8')
-        print '{:>8}% {}'.format(noun, text)
+        print '\n[Bing] {}'.format(text)
+        for translate in translates:
+            noun = round((translate['confidence'] * 100), 0)
+            text = translate['normalizedTarget'].encode('utf8')
+            print '{:>8}% {}'.format(noun, text)
+    else:
+        print '\n[Bing] Error'
 
 def translateYandex(lang, text):
     if (lang != 'error'):
@@ -87,7 +89,7 @@ def translate(lang, text):
     response = urllib2.urlopen(URL_TRANSLATE_YANDEX + '&lang=' + lang + '&text=' + text)
     data = json.load(response)
     if (data['code'] == 200):
-        print '[Yandex]'
+        print '\n[Yandex] {}'.format(text)
         print '    {}'.format(data['text'][0].encode('utf8')) # 'translate text'
 
 main(sys.argv[1:])
